@@ -51,25 +51,40 @@ alter table student add constraint FK_stu_dep foreign key(depNum) references dep
 
 alter table student drop constraint FK_stu_dep;
 -- on delete cascade
--- -> 외래키의 부모키의 row가 삭제되었을 때 외래키를 받은 테이블의 삭제된 row의 값을 가진 데이터들이 자동으로 삭제
+-- -> 기준 테이블의 데이터가 삭제되였을 떄 -> 외래 키 테이블의 데이터도 자동으로 삭제
 alter table student 
 	add constraint FK_stu_depart foreign key(depNum) references department(depNum)
 	on delete cascade;
 
--- 모든 제약조건 출력
-select * from information_schema.table_constraints;
--- 내가 사용한 제약조건 출력
+-- 모든 제약조건 출력 
+-- select * from information_schema.table_constraints;
+
 select * from information_schema.table_constraints
 	where table_schema='testdb2' and table_name='student';
 
--- testdb1 테이블의 book 테이블의 check 제약 확인
 select * from information_schema.table_constraints
- 	where table_schema='testdb1';
--- check 제약 삭제 후 조건 변경
-alter table testdb1.book drop constraint book_chk_1;
-alter table testdb1.book add check(bookPrice > 100);    
-select * from information_schema.table_constraints
- 	where table_schema='testdb1';
+	where table_name='student';
 
-alter table testdb1.book alter column bookPrice set default 1000;
+-- testdb1의 book 테이블의 check 제약 확인
+select * from information_schema.table_constraints
+	where table_schema='testdb1';
+    
+-- check 제약 삭제 후 조건 변경 
+-- alter table testdb1.book drop constraint book_chk_1;
+alter table testdb1.book add check(bookPrice > 100);
+select * from information_schema.table_constraints
+	where table_schema='testdb1';
+
+
+ alter table testdb1.book alter bookPrice drop default;
+-- 또는
 alter table testdb1.book alter column bookPrice drop default;
+
+ describe testdb1.book;
+
+-- bookPrice의 값이 null 허용하도록 변경
+alter table testdb1.book modify bookPrice int null;
+    
+-- bookPrice의 값이 default 2000 설정 변경
+alter table testdb1.book alter bookPrice set default 2000;
+describe testdb1.book;
